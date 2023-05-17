@@ -4,7 +4,7 @@ mysql:
   username: "root"
   password: "070401"
 redis:
-  address: ""
-  port: ""
+  address: "172.17.155.56"
+  port: "6379"
 token:
   phrase: ""
