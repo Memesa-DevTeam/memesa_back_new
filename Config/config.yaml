@@ -1,7 +1,8 @@
 mysql:
-  address: ""
-  port: ""
-  password: ""
+  address: "localhost"
+  port: "90"
+  username: "root"
+  password: "070401"
 redis:
   address: ""
   port: ""
