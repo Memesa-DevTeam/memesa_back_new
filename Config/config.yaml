@@ -1,0 +1,9 @@
+mysql:
+  address: ""
+  port: ""
+  password: ""
+redis:
+  address: ""
+  port: ""
+token:
+  phrase: ""
