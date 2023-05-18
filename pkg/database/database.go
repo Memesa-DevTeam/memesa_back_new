@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
@@ -66,8 +67,19 @@ func NewRedisDb(d *Database, cfg *RedisConfig) *Database {
 	return d
 }
 
+func Backup() error {
+	return nil
+}
+
 // lc
+func lc(lifecycle fx.Lifecycle) {
+	lifecycle.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			return Backup()
+		},
+	})
+}
 
 func Provide() fx.Option {
-	return fx.Options(fx.Provide(NewSqlDb, NewRedisConfig))
+	return fx.Options(fx.Provide(NewSqlDb, NewRedisDb, NewSQLConfig, NewRedisConfig), fx.Invoke(lc))
 }
