@@ -18,6 +18,7 @@ func NewJwtConfig(v *viper.Viper) *JwtConfig {
 	if err := v.UnmarshalKey("token", cfg); err != nil {
 		return applyDefaultConfig()
 	}
+	fmt.Println("Jwt Service Initialized")
 	return cfg
 }
 

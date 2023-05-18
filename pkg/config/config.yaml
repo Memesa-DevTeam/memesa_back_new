@@ -2,3 +2,14 @@ server:
     address: 0.0.0.0
     allowcors: true
     port: 8080
+token:
+    issuer: memesa-gin
+    secret: memesa
+mysql:
+    address: ""
+    port: 0
+    user: ""
+    password: ""
+redis:
+    address: ""
+    port: ""
