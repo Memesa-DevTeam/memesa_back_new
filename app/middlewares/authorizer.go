@@ -13,7 +13,7 @@ func Authorizer(cfg *jwt.JwtConfig, acfg *authorizer.AuthorizerConfig) gin.Handl
 	return func(context *gin.Context) {
 		// Get user token
 		token := context.Request.Header.Get("Authorization")
-		result := service.CheckTokenIsValid(token, cfg)
+		result := service.CheckTokenIsValid(token, context.Request.URL.String(), cfg, acfg)
 		if !result {
 			context.Next()
 		}

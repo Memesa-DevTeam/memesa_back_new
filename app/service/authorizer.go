@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"memesa_go_backend/pkg/authorizer"
 	"memesa_go_backend/pkg/jwt"
 	"regexp"
@@ -13,6 +14,7 @@ func CheckTokenIsValid(token string, targetURL string, config *jwt.JwtConfig, au
 		pattern, _ := regexp.Compile(authConfig.ExcludePaths[i] + `.*`)
 		if pattern.MatchString(targetURL) {
 			// skip checking
+			fmt.Println("Excluded Path Checked. Passing...")
 			return true
 		}
 	}
