@@ -21,7 +21,7 @@ type InitialForm struct {
 	MomentsLikeDb  interface{} `json:"momentsLikeDb"`
 }
 
-func InitializeRedisStructure(d *Database) {
+func InitializeRedisStructure(d *rejson.Handler) {
 	// Create the forms that the database will need
 	var occupationObject = make(map[string]interface{}, 1)
 	initForm := InitialForm{
@@ -29,7 +29,7 @@ func InitializeRedisStructure(d *Database) {
 		CommentsLikeDb: occupationObject,
 		MomentsLikeDb:  occupationObject,
 	}
-	res, err := d.redis.JSONSet("MEMESA_DB", "$", initForm)
+	res, err := d.JSONSet("MEMESA_DB", "$", initForm)
 	if err != nil {
 		fmt.Println(err)
 		log.Panicln("[Database/Redis.Initialization] Unable to initialize database structure")
@@ -39,32 +39,40 @@ func InitializeRedisStructure(d *Database) {
 	}
 }
 
+// TODO: Unified Two New Functions
 // Initialization Scripts
-func NewSqlDb(d *Database, cfg *SQLConfig) *Database {
+func initializeSQLDb(cfg *SQLConfig) *sql.DB {
 	Db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/memesa", cfg.User, cfg.Password, cfg.Address, cfg.Port))
 	if err != nil {
 		panic(fmt.Sprintf("Unable to initialize SQL: %s", err))
 		return nil
 	}
-	d.sql = Db
-	return d
+	return Db
 }
 
-func NewRedisDb(d *Database, cfg *RedisConfig) *Database {
+func initializeRedisDb(cfg *RedisConfig) *rejson.Handler {
+	rh := rejson.NewReJSONHandler()
 	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", cfg.Address, cfg.Port))
 	if err != nil {
 		panic(fmt.Sprintf("Unable to initialize Redis: %s", err))
 	}
 	_, err = conn.Do("FLUSHALL")
 	// Setup client
-	d.redis.SetRedigoClient(conn)
-	_, testErr := d.redis.JSONSet("Test", "$", "Hello")
+	rh.SetRedigoClient(conn)
+	_, testErr := rh.JSONSet("Test", "$", "Hello")
 	if testErr != nil {
 		panic(fmt.Sprintf("Unable to connect to Redis: %s", testErr))
 	}
 	// Initialize Database Structure
-	InitializeRedisStructure(d)
-	return d
+	InitializeRedisStructure(rh)
+	return rh
+}
+
+func NewDatabase(sqlConfig *SQLConfig, rConfig *RedisConfig) *Database {
+	return &Database{
+		sql:   initializeSQLDb(sqlConfig),
+		redis: initializeRedisDb(rConfig),
+	}
 }
 
 func Backup() error {
@@ -81,5 +89,5 @@ func lc(lifecycle fx.Lifecycle) {
 }
 
 func Provide() fx.Option {
-	return fx.Options(fx.Provide(NewSqlDb, NewRedisDb, NewSQLConfig, NewRedisConfig), fx.Invoke(lc))
+	return fx.Options(fx.Provide(NewSQLConfig, NewRedisConfig, NewDatabase), fx.Invoke(lc))
 }
