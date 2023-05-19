@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gomodule/redigo/redis"
 	"github.com/nitishm/go-rejson/v4"
 	"go.uber.org/fx"
@@ -21,6 +22,15 @@ type InitialForm struct {
 	MomentsLikeDb  interface{} `json:"momentsLikeDb"`
 }
 
+func (d *Database) CreateRedisForm() error {
+	InitializeRedisStructure(d.redis)
+	return nil
+}
+
+func (d *Database) Backup() error {
+	fmt.Println("Backing up...")
+	return nil
+}
 func InitializeRedisStructure(d *rejson.Handler) {
 	// Create the forms that the database will need
 	var occupationObject = make(map[string]interface{}, 1)
@@ -47,6 +57,7 @@ func initializeSQLDb(cfg *SQLConfig) *sql.DB {
 		panic(fmt.Sprintf("Unable to initialize SQL: %s", err))
 		return nil
 	}
+	fmt.Println("SQL initialized successfully.")
 	return Db
 }
 
@@ -63,8 +74,6 @@ func initializeRedisDb(cfg *RedisConfig) *rejson.Handler {
 	if testErr != nil {
 		panic(fmt.Sprintf("Unable to connect to Redis: %s", testErr))
 	}
-	// Initialize Database Structure
-	InitializeRedisStructure(rh)
 	return rh
 }
 
@@ -75,15 +84,14 @@ func NewDatabase(sqlConfig *SQLConfig, rConfig *RedisConfig) *Database {
 	}
 }
 
-func Backup() error {
-	return nil
-}
-
 // lc
-func lc(lifecycle fx.Lifecycle) {
+func lc(lifecycle fx.Lifecycle, db *Database) {
 	lifecycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			return db.CreateRedisForm()
+		},
 		OnStop: func(ctx context.Context) error {
-			return Backup()
+			return db.Backup()
 		},
 	})
 }

@@ -1,6 +1,9 @@
 package database
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
 
 type SQLConfig struct {
 	Address  string `yaml:"address"`
@@ -23,6 +26,7 @@ func NewSQLConfig(v *viper.Viper) *SQLConfig {
 	if err := v.UnmarshalKey("mysql", cfg); err != nil {
 		return applyDefaultSQLConfig()
 	}
+	fmt.Println("SQL Config Initialized successfully")
 	return cfg
 }
 
@@ -50,7 +54,7 @@ func NewRedisConfig(v *viper.Viper) *RedisConfig {
 func applyDefaultRedisConfig() *RedisConfig {
 	cfg := &RedisConfig{
 		Address: "127.0.0.1",
-		Port:    5173,
+		Port:    6379,
 	}
 	return cfg
 }
