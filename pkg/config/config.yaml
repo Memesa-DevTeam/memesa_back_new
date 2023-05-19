@@ -13,3 +13,5 @@ server:
 token:
     issuer: memesa-gin
     secret: memesa
+authorizer:
+    exclude: []
