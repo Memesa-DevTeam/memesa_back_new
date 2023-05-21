@@ -12,7 +12,7 @@ type AuthorizerConfig struct {
 
 func NewAuthorizerConfig(v *viper.Viper) *AuthorizerConfig {
 	cfg := new(AuthorizerConfig)
-	if v.IsSet("authorizer") {
+	if !v.IsSet("authorizer") {
 		return applyDefaultConfig()
 	}
 	if err := v.UnmarshalKey("authorizer", cfg); err != nil {

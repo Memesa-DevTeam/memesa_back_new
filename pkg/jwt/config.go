@@ -12,7 +12,7 @@ type JwtConfig struct {
 
 func NewJwtConfig(v *viper.Viper) *JwtConfig {
 	cfg := new(JwtConfig)
-	if v.IsSet("token") {
+	if !v.IsSet("token") {
 		return applyDefaultConfig()
 	}
 	if err := v.UnmarshalKey("token", cfg); err != nil {

@@ -18,5 +18,6 @@ func Authorizer(cfg *jwt.JwtConfig, acfg *authorizer.AuthorizerConfig) gin.Handl
 			context.Next()
 		}
 		context.JSON(http.StatusInternalServerError, api.ReturnResponse(http.StatusInternalServerError, "Invalid Token Access"))
+		context.Abort()
 	}
 }

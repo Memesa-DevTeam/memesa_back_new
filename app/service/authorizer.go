@@ -17,6 +17,10 @@ func CheckTokenIsValid(token string, targetURL string, config *jwt.JwtConfig, au
 			fmt.Println("Excluded Path Checked. Passing...")
 			return true
 		}
+		if targetURL == authConfig.ExcludePaths[i] {
+			fmt.Println("Excluded Path Checked. Passing...")
+			return true
+		}
 	}
 	if !jwt.CheckIsValid(token, config) {
 		return false

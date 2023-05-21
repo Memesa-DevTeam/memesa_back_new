@@ -42,7 +42,7 @@ func applyDefaultSQLConfig() *SQLConfig {
 
 func NewRedisConfig(v *viper.Viper) *RedisConfig {
 	cfg := new(RedisConfig)
-	if v.IsSet("redis") {
+	if !v.IsSet("redis") {
 		return applyDefaultRedisConfig()
 	}
 	if err := v.UnmarshalKey("redis", cfg); err != nil {

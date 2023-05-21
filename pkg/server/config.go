@@ -13,7 +13,7 @@ type ServerConfig struct {
 
 func NewServerConfig(v *viper.Viper) *ServerConfig {
 	cfg := new(ServerConfig)
-	if v.IsSet("server") {
+	if !v.IsSet("server") {
 		return applyDefaultConfig()
 	}
 	if err := v.UnmarshalKey("server", cfg); err != nil {

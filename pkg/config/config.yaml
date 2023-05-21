@@ -1,10 +1,12 @@
+authorizer:
+    exclude: []
 mysql:
     address: 127.0.0.1
     password: "070401"
     port: 90
     user: root
 redis:
-    address: "172.17.155.56"
+    address: 172.17.155.56
     port: "6379"
 server:
     address: 0.0.0.0
@@ -13,5 +15,3 @@ server:
 token:
     issuer: memesa-gin
     secret: memesa
-authorizer:
-    exclude: []

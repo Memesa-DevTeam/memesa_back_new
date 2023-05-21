@@ -68,10 +68,14 @@ func initializeRedisDb(cfg *RedisConfig) *rejson.Handler {
 		panic(fmt.Sprintf("Unable to initialize Redis: %s", err))
 	}
 	_, err = conn.Do("FLUSHALL")
+	if err != nil {
+		fmt.Println("FLUSHALL Error: ", err)
+	}
 	// Setup client
 	rh.SetRedigoClient(conn)
 	_, testErr := rh.JSONSet("Test", "$", "Hello")
 	if testErr != nil {
+		fmt.Println(fmt.Sprintf("Unable to connect to Redis: %s", testErr))
 		panic(fmt.Sprintf("Unable to connect to Redis: %s", testErr))
 	}
 	return rh
