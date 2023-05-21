@@ -5,6 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
+	"time"
 )
 
 type Authorizer struct {
@@ -37,13 +38,51 @@ func NewAuthorizer(v *viper.Viper, config *JwtConfig) *Authorizer {
 
 // Methods here
 func (a *Authorizer) GenerateToken(username, password string, rememberMe bool) (string, error) {
-	return "true", nil
+	// set valid time
+	expireTime := time.Now()
+	if rememberMe {
+		expireTime = time.Now().Add(24 * 365 * time.Hour)
+	} else {
+		expireTime = time.Now().Add(1 * time.Hour)
+	}
+
+	// generate claims user
+	userClaims := TokenClaims{
+		Username: username,
+		Password: password,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expireTime.Unix(),
+			Issuer:    a.Issuer,
+		},
+	}
+	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, userClaims)
+	// sign
+	token, err := tokenClaims.SignedString(a.Secret)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	return token, nil
 }
 
 func (a *Authorizer) ParseToken(token string) (*TokenClaims, error) {
-	return nil, nil
+	tokenClaims, err := jwt.ParseWithClaims(token, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return a.Secret, nil
+	})
+	if tokenClaims != nil {
+		if claims, ok := tokenClaims.Claims.(*TokenClaims); ok && tokenClaims.Valid {
+			return claims, nil
+		}
+	}
+	return nil, err
 }
 
 func (a *Authorizer) CheckIsValid(token string) bool {
-	return true
+	tokenClaims, _ := jwt.ParseWithClaims(token, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return a.Secret, nil
+	})
+	if tokenClaims == nil {
+		return false
+	}
+	return tokenClaims.Valid
 }

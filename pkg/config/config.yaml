@@ -13,6 +13,6 @@ server:
     allowcors: true
     port: 8080
 token:
+    exclude: []
     issuer: memesa-gin
     secret: memesa
-    exclude: []

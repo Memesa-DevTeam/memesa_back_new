@@ -15,7 +15,7 @@ func Provide() fx.Option {
 func InitRouters(authorizer *jwt.Authorizer) server.InitRouter {
 	return func(r *gin.Engine) {
 		// Middlewares
-		authorizer2.CheckTokenIsValid(authorizer)
+		r.Use(authorizer2.CheckTokenIsValid(authorizer))
 
 		// Test router
 		r.GET("/greetings", func(c *gin.Context) {
