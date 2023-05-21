@@ -6,8 +6,9 @@ import (
 )
 
 type JwtConfig struct {
-	Issuer string `yaml:"issuer"`
-	Secret string `yaml:"secret"`
+	Issuer       string   `yaml:"issuer"`
+	Secret       string   `yaml:"secret"`
+	ExcludePaths []string `yaml:"exclude"`
 }
 
 func NewJwtConfig(v *viper.Viper) *JwtConfig {
@@ -18,15 +19,16 @@ func NewJwtConfig(v *viper.Viper) *JwtConfig {
 	if err := v.UnmarshalKey("token", cfg); err != nil {
 		return applyDefaultConfig()
 	}
-	fmt.Println("Jwt Service Initialized")
 	return cfg
 }
 
 func applyDefaultConfig() *JwtConfig {
+	var emptyExclude []string
 	cfg := &JwtConfig{
-		Issuer: "memesa",
-		Secret: "memesa",
+		Issuer:       "memesa-gin",
+		Secret:       "memesa",
+		ExcludePaths: emptyExclude,
 	}
-	fmt.Println("Using Default Jwt Configuration")
+	fmt.Println("Using default Jwt Configuration...")
 	return cfg
 }
